@@ -1,3 +1,10 @@
+"""
+Created on Sep 18 2019
+
+@author: sindrhpa
+"""
+
+
 import numpy as np
 
 _troposLim = 11000
