@@ -1,14 +1,15 @@
 """
 Created on Sep 18 2019
-
 @author: sindrhpa
 """
-
 
 import numpy as np
 
 _troposLim = 11000
 _lstratLim = 25000
+
+def airResistance(h, Cd, A, v):
+    return 1/2 * Cd * density(h) * A * v*v
 
 def density(h):
     k = 3.4855  # K*s^2/m^2
