@@ -21,8 +21,8 @@ class Orbit:
     def __init__(self,
                  init_state = [0, 0, 1, 2, 0],
                  G=1,
-                 m1=1,
-                 m2=3): 
+                 m1=5.9736e14,
+                 m2=7.3477e12): 
         self.GravConst = G
         self.mPlanet = m1
         self.mSol = m2
