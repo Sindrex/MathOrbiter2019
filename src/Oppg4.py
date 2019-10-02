@@ -23,6 +23,7 @@ stage3_drymass = 13500
 stage3_grossmass = 123000
 stage3_fuelmass = stage3_grossmass - stage3_drymass
 total_grossmass = stage1_grossmass + stage2_grossmass + stage3_grossmass
+final_grossmass = stage3_grossmass - stage3_fuelmass
 
 # burn duration, s
 stage1_duration = 168
