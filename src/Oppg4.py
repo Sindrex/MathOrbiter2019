@@ -40,6 +40,11 @@ stage1_exhaustVel = -stage1_thrust/stage1_dmass
 stage2_exhaustVel = -stage2_thrust/stage2_dmass
 stage3_exhaustVel = -stage3_thrust/stage3_dmass
 
+# other values
+diameter = 10.1  # m
+area = np.pi * (diameter/2)**2
+Cd = 1
+
 # mass after t sec
 def m(t):
     delta = 0

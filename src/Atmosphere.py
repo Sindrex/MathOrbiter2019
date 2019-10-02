@@ -5,17 +5,17 @@ Created on Sep 18 2019
 
 import numpy as np
 
-_troposLim = 11000
-_lstratLim = 25000
+_troposLim = 11000  # m
+_lstratLim = 25000  # m
 
 def airResistance(h, Cd, A, v):
-    return 1/2 * Cd * density(h) * A * v*v
+    return 1/2 * Cd * density(h) * A * v*v  # N
 
 def density(h):
     k = 3.4855  # K*s^2/m^2
-    return pressure(h)/temperature(h)*k
+    return pressure(h)/temperature(h)*k  # kg/m^3
 
-def pressure(h):
+def pressure(h):  # Pa
     if h <= _troposLim:
         return _troposP(h)
     elif h <= _lstratLim:
@@ -23,7 +23,7 @@ def pressure(h):
     else:
         return _ustratP(h)
 
-def temperature(h):
+def temperature(h):  # K
     if h <= _troposLim:
         return _troposT(h)
     elif h <= _lstratLim:
@@ -44,8 +44,8 @@ def _troposT(h):
 
 def _lstratP(h):
     k1 = 127.76*1000  # Pa
-    k2 = 0.000157
-    return k1 * np.exp(-(1/k2)*h)
+    k2 = 0.000157  # m^-1
+    return k1 * np.exp(-(k2)*h)
 
 def _lstratT(h):
     return 216.69  # Kelvin
