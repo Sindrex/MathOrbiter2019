@@ -42,9 +42,9 @@ stage2_exhaustVel = -stage2_thrust/stage2_dmass
 stage3_exhaustVel = -stage3_thrust/stage3_dmass
 
 # other values
-diameter = 10.1  # m
-area = np.pi * (diameter/2)**2
-Cd = 1
+rocket_diameter = 10.1  # m
+rocket_cross_area = np.pi * (rocket_diameter/2)**2  # m^2
+rocket_Cd = 0.515
 
 # mass after t sec
 def m(t):
@@ -52,11 +52,11 @@ def m(t):
     if t <= stage1_duration:
         delta = stage1_dmass * t
     elif t <= (stage1_duration + stage2_duration):
-        t = t - stage1_duration
-        delta = stage1_grossmass + stage2_dmass * t
+        t1 = t - stage1_duration
+        delta = stage1_grossmass + stage2_dmass * t1
     elif t <= (stage1_duration + stage2_duration + stage3_duration):
-        t = t - stage1_duration - stage2_duration
-        delta = stage1_grossmass + stage2_grossmass + stage3_dmass * t
+        t1 = t - stage1_duration - stage2_duration
+        delta = stage1_grossmass + stage2_grossmass + stage3_dmass * t1
     else:
         delta = stage1_grossmass + stage2_grossmass + stage3_fuelmass
     return total_grossmass - delta
