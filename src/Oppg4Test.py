@@ -1,3 +1,8 @@
+"""
+Created on Sep 30 2019
+@author: sindrhpa
+"""
+
 from src.Oppg4 import *
 
 import matplotlib.pyplot as plt

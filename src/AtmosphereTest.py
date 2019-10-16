@@ -1,3 +1,8 @@
+"""
+Created on Sep 18 2019
+@author: sindrhpa
+"""
+
 from src.Atmosphere import pressure, temperature, density, airResistance
 
 import matplotlib.pyplot as plt

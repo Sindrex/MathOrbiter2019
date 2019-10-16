@@ -9,11 +9,16 @@ _troposLim = 11000  # m
 _lstratLim = 25000  # m
 
 def airResistance(h, Cd, A, v):
+    # print(">>> Dens", density(h))
     return 1/2 * Cd * density(h) * A * v*v  # N
 
+# Gitt var feil, bruker: https://www.omnicalculator.com/physics/air-density
+# Se også https://www.engineeringtoolbox.com/standard-atmosphere-d_604.html
 def density(h):
-    k = 3.4855  # K*s^2/m^2
-    return pressure(h)/temperature(h)*k  # kg/m^3
+    k = 3.4855/1000  # K*s^2/m^2
+    k2 = 287.058  # J/(kg*K)
+    # print(">>>> pres:", pressure(h), "temp:", temperature(h))
+    return pressure(h)/(temperature(h))*k  # kg/m^3
 
 def pressure(h):  # Pa
     if h <= _troposLim:
