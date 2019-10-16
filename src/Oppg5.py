@@ -8,6 +8,7 @@ from src.Oppg4 import *
 from src.Physics import *
 from src.EarthMoonData import *
 from src.Atmosphere import *
+from src.RK45 import *
 import matplotlib.pyplot as plt
 
 # Equation from https://www.narom.no/undervisningsressurser/sarepta/rocket-theory/rocket-engines/the-rocket-equation/
@@ -27,31 +28,32 @@ ve = stage3_exhaustVel
 dv3 = -ve * np.log(stage3_grossmass/stage3_drymass) - g * t
 
 dv = dv1 + dv2 + dv3
-print(dv)
+print("dv:", dv)
 
-# Euler
-h_arr = []
-dt = 1
-h = 0
-v = 0
-for t in np.arange(0, total_duration, dt):
+
+def F(t, y):
+    h, v = y
     r = h + earth_diameter_eqv/2
-    Fg = - forceGravity(m(t), earth_mass, r)
+    Fg = -forceGravity(m(t), earth_mass, r)
     Fr = rocketThrust(t)
     Fd = -airResistance(h, rocket_Cd, rocket_cross_area, v) #-np.sign(v)
     force = Fr + Fg + Fd
     a = force/m(t)
-    v = v + a * dt
-    h = h + v * dt
-    print("h:", h, "v:", v, "Fr:", Fr, "Fd:", Fd, "Fg:", Fg, "SumForce:", force)
-    if(h <= 0):
-        print("Crashed into earth")
-        #print("Max height:", h, "m")
-        break
-    h_arr.append(h)
+    return np.array([v, a])
 
-#print(h_arr)
 
-X = list(np.linspace(0, total_duration/dt, len(h_arr)))
-plt.plot(X, h_arr)
+# RK45
+y0 = np.array([0, 0])  # [v, h]
+t0 = 0
+step = 1200*1e-5
+T = 1e-4
+t, w = RK45(F, y0, t0, total_duration, step, T)
+h, v = zip(*w)
+
+X = list(np.linspace(0, total_duration, len(h)))
+
+plt.plot(X, h)
+plt.title('Height based on time')
+plt.ylabel('height (m)')
+plt.xlabel('time (s)')
 plt.show()
