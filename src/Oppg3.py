@@ -6,6 +6,7 @@ import matplotlib
 from matplotlib import pyplot as plt
 from matplotlib import animation
 matplotlib.use('TkAgg')
+from timeit import default_timer
 
 def F(t, y):
     x, y, vx, vy = y
@@ -22,17 +23,22 @@ def F(t, y):
 def init():
     """initialize animation"""
     line.set_data([], [])
-    return line,
+    time_text.set_text('')
+    return line, time_text
 
 
 def animate(i):
     """perform animation step"""
-    global t, w
-    while t < i*60*60*24 * 16.666/1000 or w is None:
+    global t, w, time_passed
+    time_passed = default_timer() - start_anim_time
+    while t < time_passed*60*60*24 or w is None:
         t, w = next(it)
+        time_passed = default_timer() - start_anim_time
     x, y, vx, vy = w
     line.set_data(x, y)
-    return line,
+
+    time_text.set_text(f'T = {time_passed:.2f} days')
+    return line, time_text
 
 
 if __name__ == '__main__':
@@ -54,10 +60,15 @@ if __name__ == '__main__':
 
     line, = axes.plot([], [], color='grey', marker='o', lw=2)
     axes.scatter([0], [0], c='blue')
+
+    time_text = axes.text(0.02, 0.95, '', transform=axes.transAxes)
+
+    start_anim_time = default_timer()
+    time_passed = 0
     anim = animation.FuncAnimation(fig,  # figure to plot in
                                    animate,  # function that is called on each frame
                                    repeat=True,
-                                   interval=16.66666,
+                                   interval=0,
                                    blit=True,
                                    init_func=init  # initialization
                                    )
