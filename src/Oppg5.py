@@ -26,7 +26,7 @@ if __name__ == "__main__":
     t0 = 0
     step = 1200*1e-5
     T = 1e-10
-    exTime = 0
+    exTime = 5000
     t, w = RK45(F, y0, t0, total_duration + exTime, step, T)
     h, v = zip(*w)
 
