@@ -14,7 +14,9 @@ import matplotlib.pyplot as plt
 theta = np.pi/3  # np.pi/3 works
 maxr = 10
 minr = np.inf
+prevT = -1
 
+# DEPRECATED
 def F(t, y):
     x, y, vx, vy = y
     y_true = y + earth_diameter_eqv/2
@@ -41,11 +43,12 @@ def F(t, y):
     return np.array([vx, vy, ax, ay])
 
 def F2(t, y):
-    global maxr, minr
+    global maxr, minr, prevT
     #y0 = earth diameter/2
     x, y, vx, vy = y
     r = (y**2 + x**2)**0.5
     #y/r = sin(tetha) => theta = sin-1(y/r)
+    #print("Theta:", theta)
     angle = theta
     Fg = -forceGravity(m(t), earth_mass, r)
     Fgx = x/r * Fg
@@ -59,7 +62,7 @@ def F2(t, y):
     else:
         v_norm_x = 1
         v_norm_y = 1
-    if r<7.15e6: #7.2 works
+    if r<7.15e6: #7.15e6 works
         Frx = Fr*np.cos(angle)
         Fry = Fr*np.sin(angle)
     else:
@@ -72,17 +75,20 @@ def F2(t, y):
     ax = force_x/m_t
     ay = force_y/m_t
     if(t>10000):
-        print("t:", t, "r:", r, "Frx:", Frx, "Fry:", Fry)
+        #print("t:", t, "r:", r, "Frx:", Frx, "Fry:", Fry)
         if(r > maxr):
             maxr = r
         if(r < minr):
             minr = r
+    if prevT == t:
+        print("same t:", t)
+    prevT = t
     #print("x:", x, "y:", y, "m:", m_t, "Fdx:", Fd*v_norm_x, "Fdy:", Fd*v_norm_y, "Fgx:", Fgx, "Fgy:", Fgy, "force_x:", force_x, "force_y:", force_y, "ax:", ax, "ay:", ay)
     return np.array([vx, vy, ax, ay])
 
 
 if __name__ == "__main__":
-    # RK45, med vinkel
+    # RK45, med vinkel theta
     y0 = np.array([0, earth_diameter_eqv/2, 0, 0])  # [x, y, vx, vy]
     t0 = 0
     step = 1200*1e-5
@@ -90,9 +96,11 @@ if __name__ == "__main__":
     extra = 20000
     t, w = RK45(F2, y0, t0, total_duration + extra, step, T)
     x, y, vx, vy = zip(*w)
+
     print("Max r:", maxr, "Min r:", minr)
 
-    if(False):
+    # plotting
+    if True:
         plt.plot(t, y, color='y')
         plt.plot(t, [earth_diameter_eqv/2 for i in t], color='r')
         plt.title('Height based on time')
@@ -110,7 +118,7 @@ if __name__ == "__main__":
         line.set_data(x[i], y[i])
         return line,
 
-
+    # Animering
     fig = plt.figure()
     axes = fig.add_subplot(111, aspect='equal', autoscale_on=False,
                            xlim=(-0.15e8, 0.15e8),
@@ -119,7 +127,7 @@ if __name__ == "__main__":
     line, = axes.plot([], [], color='r', marker='o', lw=3)
     anim = animation.FuncAnimation(fig, animate, repeat=True, interval=0, blit=True, init_func=init)
     #x = np.linspace(-earth_diameter_eqv/2, earth_diameter_eqv, 500)
-   # y = np.sqrt(-x**2 + earth_diameter_eqv/2)
+    # y = np.sqrt(-x**2 + earth_diameter_eqv/2)
     #axes.plot(x, y, c='blue')
     #axes.plot(x, -y, color='blue')
     axes.add_artist(plt.Circle((0,0), earth_diameter_eqv/2, color='blue'))
