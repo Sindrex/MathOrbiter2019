@@ -10,14 +10,15 @@ from src.EarthMoonData import *
 from src.Atmosphere import *
 from src.RK45 import *
 import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('TkAgg')
 
-maxr = 10
-minr = np.inf
 prevT = -1
 
-Fr_angle = 0.8751520472211607 #10m 1.0889561834065051 #np.pi/2.8  # np.pi/3 works
+Fr_angle = 1.2658864862178714 #better than 10min: 1.147902139420116
+# gives apoapsis 1.017294e+07, periapsis 9.000022e+06
 v_angle = 0 # 0 er +x, np.pi = -x
-time_up = 8*60
+time_up = 12*60
 
 # DEPRECATED
 def F(t, y):
@@ -90,13 +91,11 @@ if __name__ == "__main__":
     # RK45, med vinkel theta
     y0 = np.array([0, earth_diameter_eqv/2, 0, 0])  # [x, y, vx, vy]
     t0 = 0
-    step = 1200*1e-5
-    T = 1e-8
-    extra = 80000
+    T = 1e-10
+    step = T/10
+    extra = 3*60*60
     t, w = RK45(F2, y0, t0, total_duration + extra, step, T)
     x, y, vx, vy = zip(*w)
-
-    print("Max r:", maxr, "Min r:", minr)
 
     # plotting
     if True:
@@ -111,21 +110,32 @@ if __name__ == "__main__":
 
     def init():
         line.set_data([0], [0])
-        return line,
+        dot.set_data([0], [0])
+        return line, dot
 
     def animate(i):
-        i *= 1
-        line.set_data(x[i], y[i])
-        return line,
+        t_to_meet = 5*60*i/60
+        correct_i = -1
+        for i, e in enumerate(t):
+            if e > t_to_meet:
+                correct_i = i
+                break
+
+        print(t)
+        line.set_data(x[:correct_i], y[:correct_i])
+        dot.set_data(x[correct_i], y[correct_i])
+        return line, dot
 
     # Animering
     fig = plt.figure()
-    axes = fig.add_subplot(111, aspect='equal', autoscale_on=False,
-                           xlim=(-0.2e8, 0.2e8),
-                           ylim=(-0.2e8, 0.2e8)
+    axes = fig.add_subplot(111, aspect='equal', autoscale_on=True,
+                           xlim=(-1.5e7, 1.5e7),
+                           ylim=(-1.5e7, 1.5e7)
                            )
-    line, = axes.plot([], [], color='r', marker='o', lw=3)
-    anim = animation.FuncAnimation(fig, animate, repeat=True, interval=0, blit=True, init_func=init)
+    axes.grid(True, 'major')
+    line, = axes.plot([], [], color='r', lw=1)
+    dot, = axes.plot([], [], color='r', marker='o', lw=3)
+    anim = animation.FuncAnimation(fig, animate, repeat=True, interval=(1/60), blit=True, init_func=init)
     #x = np.linspace(-earth_diameter_eqv/2, earth_diameter_eqv, 500)
     # y = np.sqrt(-x**2 + earth_diameter_eqv/2)
     #axes.plot(x, y, c='blue')
@@ -138,29 +148,36 @@ if __name__ == "__main__":
     Fr_angleB = 0.45*np.pi
     Fr_angleM = (Fr_angleA + Fr_angleB) / 2
 
+    prev_metric = 0
+    T = 1e-12
     while True:
         y0 = np.array([0, earth_diameter_eqv / 2, 0, 0])  # [x, y, vx, vy]
         t0 = 0
-        step = 1200 * 1e-5
-        T = 1e-2
-        extra = 20000
+
+        step = 1
 
         #A
         Fr_angle = Fr_angleM
         t, w = RK45(F2, y0, t0, total_duration + extra, step, T)
         x, y, vx, vy = zip(*w)
-        bonustime_i = -1
+        extra_time_i = -1
         for i, e in enumerate(t):
-            if e > 1200:
-                bonustime_i = i
+            if e > total_duration:
+                extra_time_i = i
                 break
 
-        avg_radius = sum([np.sqrt(x_i**2 + y_i**2) for x_i, y_i in zip(x[bonustime_i:], y[bonustime_i:])])/(len(t)-bonustime_i)
-        metric = avg_radius - 7e6
+        radii = [np.sqrt(x_i ** 2 + y_i ** 2) for x_i, y_i in zip(x[extra_time_i:], y[extra_time_i:])]
+        periapsis = min(radii)
+        apoapsis = max(radii)
+        metric = periapsis - 9e6
+
         if metric > 0:
             Fr_angleA = Fr_angleM
         else:
             Fr_angleB = Fr_angleM
         Fr_angleM = (Fr_angleA + Fr_angleB) / 2
-        print(f'M: {Fr_angleM}\tmetric: {metric}')
+        print(f'M: {Fr_angleM}\tmetric: {metric}\tapo: {apoapsis:5e}\tperi: {periapsis:5e}')
+        if metric - prev_metric == 0:
+            break
+        prev_metric = metric
 
