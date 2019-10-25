@@ -15,7 +15,7 @@ matplotlib.use('TkAgg')
 
 prevT = -1
 
-Fr_angle = 1.2658864862178714 #better than 10min: 1.147902139420116
+Fr_angle = np.pi/2.5 #1.2658864862178714 #better than 10min: 1.147902139420116
 # gives apoapsis 1.017294e+07, periapsis 9.000022e+06
 v_angle = 0 # 0 er +x, np.pi = -x
 time_up = 12*60
